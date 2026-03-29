@@ -24,7 +24,7 @@ class BunchDict(dict):
 def load(path: Optional[Path | str] = None, /):
     global dynamic_conf, conf
 
-    envs = os.environ | dotenv.dotenv_values(dotenv_path=os.getenv("ENVFILE"))
+    envs = dotenv.dotenv_values(dotenv_path=os.getenv("ENVFILE"))
     if path is None:
         path = Path(
             envs.get(
@@ -32,6 +32,8 @@ def load(path: Optional[Path | str] = None, /):
                 Path(envs.get("PROJECT_ROOT", ".")) / "assets" / "settings.yaml",
             )
         )
+    else:
+        path = Path(path)
 
     if not path.exists():
         raise RuntimeError(f"Settings file was not found at {path.absolute()}")
@@ -41,6 +43,7 @@ def load(path: Optional[Path | str] = None, /):
             dynamic_conf.envs = dict()
         for key, value in envs.items():
             setattr(dynamic_conf.envs, key, value)
+
         conf = BunchDict(**dynamic_conf)
 
 
